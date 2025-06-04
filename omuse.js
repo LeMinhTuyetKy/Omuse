@@ -201,7 +201,9 @@ let animated = false;
 function animateStats() {
     if (animated) return;
 
-    const statsSection = document.querySelector('.about-stats');
+    const statsSection = document.querySelector('.stats-section');
+    if (!statsSection) return;
+
     const statsPosition = statsSection.getBoundingClientRect().top;
     const screenPosition = window.innerHeight / 1.3;
 
@@ -234,27 +236,83 @@ window.addEventListener('scroll', animateStats);
 // Feature Cards Animation
 document.addEventListener('DOMContentLoaded', function() {
     const featureCards = document.querySelectorAll('.feature-card');
+    const featuresGrid = document.querySelector('.features-grid');
+    
+    if (featuresGrid) {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        featuresGrid.addEventListener('mousedown', (e) => {
+            isDown = true;
+            featuresGrid.style.cursor = 'grabbing';
+            startX = e.pageX - featuresGrid.offsetLeft;
+            scrollLeft = featuresGrid.scrollLeft;
+        });
+
+        featuresGrid.addEventListener('mouseleave', () => {
+            isDown = false;
+            featuresGrid.style.cursor = 'grab';
+        });
+
+        featuresGrid.addEventListener('mouseup', () => {
+            isDown = false;
+            featuresGrid.style.cursor = 'grab';
+        });
+
+        featuresGrid.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - featuresGrid.offsetLeft;
+            const walk = (x - startX) * 2;
+            featuresGrid.scrollLeft = scrollLeft - walk;
+        });
+
+        // Touch events for mobile
+        featuresGrid.addEventListener('touchstart', (e) => {
+            isDown = true;
+            startX = e.touches[0].pageX - featuresGrid.offsetLeft;
+            scrollLeft = featuresGrid.scrollLeft;
+        });
+
+        featuresGrid.addEventListener('touchend', () => {
+            isDown = false;
+        });
+
+        featuresGrid.addEventListener('touchmove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.touches[0].pageX - featuresGrid.offsetLeft;
+            const walk = (x - startX) * 2;
+            featuresGrid.scrollLeft = scrollLeft - walk;
+        });
+    }
     
     featureCards.forEach(card => {
+        // Add hover effect
         card.addEventListener('mouseenter', function() {
-            const icon = this.querySelector('.feature-icon');
-            const glow = this.querySelector('.icon-glow');
-            const line = this.querySelector('.decoration-line');
-            
-            if (icon) icon.style.transform = 'scale(1.1)';
-            if (glow) glow.style.opacity = '1';
-            if (line) line.style.opacity = '1';
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.1)';
         });
         
         card.addEventListener('mouseleave', function() {
-            const icon = this.querySelector('.feature-icon');
-            const glow = this.querySelector('.icon-glow');
-            const line = this.querySelector('.decoration-line');
-            
-            if (icon) icon.style.transform = 'scale(1)';
-            if (glow) glow.style.opacity = '0';
-            if (line) line.style.opacity = '0';
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.05)';
         });
+
+        // Add scroll animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        observer.observe(card);
     });
 });
 
@@ -270,5 +328,26 @@ contactItems.forEach(item => {
     item.addEventListener('mouseleave', () => {
         item.style.transform = 'translateY(0)';
         item.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    });
+});
+
+// Footer Accordion
+document.addEventListener('DOMContentLoaded', function() {
+    const footerSections = document.querySelectorAll('.footer-section');
+    
+    footerSections.forEach(section => {
+        const heading = section.querySelector('h3');
+        
+        heading.addEventListener('click', () => {
+            // Close other sections
+            footerSections.forEach(otherSection => {
+                if (otherSection !== section && otherSection.classList.contains('active')) {
+                    otherSection.classList.remove('active');
+                }
+            });
+            
+            // Toggle current section
+            section.classList.toggle('active');
+        });
     });
 }); 
