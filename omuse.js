@@ -420,3 +420,37 @@ document.querySelector('#sidebarCloseBtn').addEventListener('click', () => {
     document.querySelector('.mobile-sidebar').classList.remove('active');
     document.querySelector('.sidebar-overlay').classList.remove('active');
 });
+
+// Force light mode
+function forceLightMode() {
+    // Add light mode class to html element
+    document.documentElement.classList.add('light-mode');
+    document.documentElement.classList.remove('dark-mode');
+    
+    // Set meta theme-color
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#FFF8F5');
+    }
+
+    // Force light color scheme
+    document.documentElement.style.colorScheme = 'light';
+    document.documentElement.style.forcedColorAdjust = 'none';
+}
+
+// Check and force light mode on load
+document.addEventListener('DOMContentLoaded', function() {
+    forceLightMode();
+    
+    // Watch for system color scheme changes
+    if (window.matchMedia) {
+        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Force light mode when system changes to dark
+        darkModeMediaQuery.addEventListener('change', (e) => {
+            if (e.matches) {
+                forceLightMode();
+            }
+        });
+    }
+});
