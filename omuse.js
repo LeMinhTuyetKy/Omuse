@@ -351,3 +351,72 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 }); 
+
+// Initialize AOS
+AOS.init({
+    duration: 800,
+    once: true
+});
+
+// Cherry Blossom Effect
+function createPetals() {
+    const container = document.querySelector('.cherry-blossoms');
+    let activePetals = 0;
+    const maxActivePetals = 12; // Số lượng cánh hoa tối đa
+    const petalsPerGroup = 3; // Số cánh hoa mỗi nhóm
+
+    function createPetalGroup() {
+        if (activePetals >= maxActivePetals) return;
+
+        // Tạo một nhóm cánh hoa
+        for (let i = 0; i < petalsPerGroup; i++) {
+            if (activePetals >= maxActivePetals) break;
+
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            
+            // Tạo vị trí ngẫu nhiên theo chiều ngang
+            const startX = Math.random() * window.innerWidth;
+            petal.style.left = `${startX}px`;
+            petal.style.top = '-20px';
+            
+            // Tạo tốc độ rơi ngẫu nhiên
+            const duration = 6 + Math.random() * 4; // 6-10 giây
+            const delay = Math.random() * 2; // 0-2 giây delay
+            
+            petal.style.animationDuration = `${duration}s`;
+            petal.style.animationDelay = `${delay}s`;
+            
+            container.appendChild(petal);
+            activePetals++;
+
+            // Xóa cánh hoa sau khi animation hoàn thành
+            setTimeout(() => {
+                if (petal.parentNode) {
+                    petal.remove();
+                    activePetals--;
+                }
+            }, (duration + delay) * 1000);
+        }
+    }
+
+    // Tạo nhóm cánh hoa đầu tiên
+    createPetalGroup();
+
+    // Tạo nhóm cánh hoa mới mỗi 2 giây
+    setInterval(createPetalGroup, 2000);
+}
+
+// Chạy hiệu ứng khi trang load
+document.addEventListener('DOMContentLoaded', createPetals);
+
+// Mobile Menu Toggle
+document.querySelector('.mobile-menu-icon').addEventListener('click', () => {
+    document.querySelector('.mobile-sidebar').classList.add('active');
+    document.querySelector('.sidebar-overlay').classList.add('active');
+});
+
+document.querySelector('#sidebarCloseBtn').addEventListener('click', () => {
+    document.querySelector('.mobile-sidebar').classList.remove('active');
+    document.querySelector('.sidebar-overlay').classList.remove('active');
+});
